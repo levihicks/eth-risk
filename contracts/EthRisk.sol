@@ -83,7 +83,10 @@ contract EthRisk {
             }
             else if (_troopDestinations[i] > 0) 
                 revert("Deployed in invalid territory.");
-            troopsToDeploy += _troopDestinations[i];
+            if (_troopDestinations[i] > 0)
+                troopsToDeploy += _troopDestinations[i];
+            else if (_troopDestinations[i] < 0)
+                revert("Negative troop deployment value.");
         }
         require(troopsAllowed == troopsToDeploy, "Invalid amount of troops.");
         nextStatusPhase(_gameId);

@@ -20,6 +20,15 @@ async function main() {
 
   await ethRisk.deployed();
 
+  const newGameTx = await ethRisk.newGame([
+    "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", 
+    "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+  ]);
+
+  const txData = await newGameTx.wait();
+
+  console.log('gas used: ' + txData.gasUsed);
+
   console.log("EthRisk deployed to:", ethRisk.address);
 }
 
