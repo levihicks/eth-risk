@@ -207,6 +207,13 @@ contract EthRisk {
         return uint(keccak256(abi.encodePacked(block.timestamp, msg.sender, _nonce))) % 6 + 1;
     }
 
+    /** @dev Concludes attack phase and transitions game to fortify phase.
+     *  @param _gameId ID of the game in play.
+     */
+    function concludeAttack(uint _gameId) public onlyDuringStatus(GameStatus.Attack, _gameId) {
+        nextStatusPhase(_gameId);
+    }
+
     /** @dev Move game's status to the next phase.
      *  @param _gameId ID of the game whose status will be changed.
      */
