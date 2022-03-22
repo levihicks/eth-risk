@@ -212,6 +212,27 @@ contract EthRisk {
         nextStatusPhase(_gameId);
     }
 
+    /** @dev Fortify troops from one owned territory to another
+     *  @param _gameId ID of the game in play.
+     *  @param _from Territory to fortify troops from.
+     *  @param _to Territory to fortify troops to.
+     *  @param _amount Amount of troops to fortify. 
+     */
+    function fortify(
+        uint _gameId, 
+        uint _from, 
+        uint _to,
+        uint _amount
+    ) public onlyDuringStatus(GameStatus.Fortify, _gameId) correctTurn(_gameId, msg.sender) {
+        require(_amount < territories[_gameId][_from].troopCount, "Can't fortify that many troops.");
+        address fromOwner = territories[_gameId][_from].owner;
+        address toOwner = territories[_gameId][_to].owner;
+        require(fromOwner == toOwner && fromOwner == msg.sender, "Can't fortify in enemy land.");
+        territories[_gameId][_from].troopCount -= _amount;
+        territories[_gameId][_to].troopCount += _amount;
+        nextStatusPhase(_gameId);
+    }
+
     /** @dev Move game's status to the next phase.
      *  @param _gameId ID of the game whose status will be changed.
      */
@@ -221,7 +242,10 @@ contract EthRisk {
             games[_gameId].status = GameStatus.Attack;
         else if (current == GameStatus.Attack)
             games[_gameId].status = GameStatus.Fortify;
-        else if (current == GameStatus.Fortify)
+        else if (current == GameStatus.Fortify) {
+            uint nextTurn = games[_gameId].players[0] == games[_gameId].whoseTurn ? 1 : 0;
+            games[_gameId].whoseTurn = games[_gameId].players[nextTurn];
             games[_gameId].status = GameStatus.Deploy;
+        }
     } 
 }
