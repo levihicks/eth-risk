@@ -216,7 +216,8 @@ contract EthRisk {
     /** @dev Concludes attack phase and transitions game to fortify phase.
      *  @param _gameId ID of the game in play.
      */
-    function concludeAttack(uint _gameId) public onlyDuringStatus(GameStatus.Attack, _gameId) {
+    function concludeAttack(uint _gameId) 
+        public onlyDuringStatus(GameStatus.Attack, _gameId) correctTurn(_gameId, msg.sender) {
         if (games[_gameId].whoseTurn != address(0))
             nextStatusPhase(_gameId);
     }
