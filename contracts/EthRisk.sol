@@ -127,6 +127,14 @@ contract EthRisk {
                 }
             }
         }
+        bool gameOver = true;
+        for (uint i = 0; i < gameMap.length; i++) {
+            if (territories[_gameId][i].owner != msg.sender) {
+                gameOver = false;
+                break;
+            }
+        }
+        if (gameOver) games[_gameId].whoseTurn = address(0);
     }
 
     /** @dev Conduct attack on another territory.
@@ -209,7 +217,8 @@ contract EthRisk {
      *  @param _gameId ID of the game in play.
      */
     function concludeAttack(uint _gameId) public onlyDuringStatus(GameStatus.Attack, _gameId) {
-        nextStatusPhase(_gameId);
+        if (games[_gameId].whoseTurn != address(0))
+            nextStatusPhase(_gameId);
     }
 
     /** @dev Fortify troops from one owned territory to another
