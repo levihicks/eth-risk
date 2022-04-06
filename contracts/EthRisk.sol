@@ -26,6 +26,11 @@ contract EthRisk {
     mapping(address => uint[]) public playersToGames; // playersToGames[player] == array of player's games
     mapping(uint => Territory[]) public territories; // territories[gameId] == array of territories for that game
 
+    /** @dev Emitted when new game is created.
+     *  @param _gameId ID of new game.
+     */
+    event NewGame(uint _gameId);
+
     /** @dev Requires a specific game status.
      *  @param _status Required status of game.
      *  @param _gameId ID of game to check status for.
@@ -53,18 +58,18 @@ contract EthRisk {
 
     /** @dev Begins a new game.
      *  @param _players The two players who will play against each other.
-     *  @return newGameId The id of the newly created game.
      */
-    function newGame(address[] memory _players) public returns (uint newGameId) {
+    function newGame(address[] memory _players) public {
         require(_players.length == 2, "Two players required.");
         games.push(Game(_players, _players[0], GameStatus.Deploy));
-        newGameId = games.length - 1;
+        uint newGameId = games.length - 1;
         for(uint i = 0; i < gameMap.length; i++) {
             territories[newGameId].push(Territory(_players[i < gameMap.length / 2 ? 0 : 1], 2));
         }
         for(uint i = 0; i < _players.length; i++) {
             playersToGames[_players[i]].push(newGameId);
         }
+        emit NewGame(newGameId);
     }
 
     /** @dev Deploys new troops to selected territories.
