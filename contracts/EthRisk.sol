@@ -23,13 +23,14 @@ contract EthRisk {
 
     uint[][] public gameMap; // gameMap[territoryId] == array of territory's neighbors
     Game[] public games; // array of games played or in-play
-    mapping(address => uint[]) public playersToGames; // playersToGames[player] == array of player's games
     mapping(uint => Territory[]) public territories; // territories[gameId] == array of territories for that game
 
     /** @dev Emitted when new game is created.
      *  @param _gameId ID of new game.
+     *  @param _player1 Player 1.
+     *  @param _player2 Player 2.
      */
-    event NewGame(uint _gameId);
+    event NewGame(uint _gameId, address indexed _player1, address indexed _player2);
 
     /** @dev Requires a specific game status.
      *  @param _status Required status of game.
@@ -66,10 +67,7 @@ contract EthRisk {
         for(uint i = 0; i < gameMap.length; i++) {
             territories[newGameId].push(Territory(_players[i < gameMap.length / 2 ? 0 : 1], 2));
         }
-        for(uint i = 0; i < _players.length; i++) {
-            playersToGames[_players[i]].push(newGameId);
-        }
-        emit NewGame(newGameId);
+        emit NewGame(newGameId, _players[0], _players[1]);
     }
 
     /** @dev Deploys new troops to selected territories.
